@@ -1,0 +1,1295 @@
+{
+  "Microsoft.Search/searchServices": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Web/sites": [
+    "AppServiceAppLogs",
+    "AppServiceAuditLogs",
+    "AppServiceAuthenticationLogs",
+    "AppServiceConsoleLogs",
+    "AppServiceFileAuditLogs",
+    "AppServiceHTTPLogs",
+    "AppServiceIPSecAuditLogs",
+    "AppServicePlatformLogs",
+    "AppServiceServerlessSecurityPluginData",
+    "AzureActivity",
+    "AzureMetrics",
+    "FunctionAppLogs",
+    "LogicAppWorkflowRuntime"
+  ],
+  "Microsoft.AgFoodPlatform/farmBeats": [
+    "AgriFoodApplicationAuditLogs",
+    "AgriFoodFarmManagementLogs",
+    "AgriFoodFarmOperationLogs",
+    "AgriFoodInsightLogs",
+    "AgriFoodJobProcessedLogs",
+    "AgriFoodModelInferenceLogs",
+    "AgriFoodProviderAuthLogs",
+    "AgriFoodSatelliteLogs",
+    "AgriFoodSensorManagementLogs",
+    "AgriFoodWeatherLogs"
+  ],
+  "Microsoft.EventGrid/namespaces": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "EGNFailedHttpDataPlaneOperations",
+    "EGNFailedMqttConnections",
+    "EGNFailedMqttPublishedMessages",
+    "EGNFailedMqttSubscriptions",
+    "EGNMqttDisconnections",
+    "EGNSuccessfulHttpDataPlaneOperations",
+    "EGNSuccessfulMqttConnections"
+  ],
+  "Microsoft.ContainerInstance/containerGroups": [
+    "ContainerEvent",
+    "ContainerInstanceLog"
+  ],
+  "Microsoft.EventGrid/topics": [
+    "AegDataPlaneRequests",
+    "AegDeliveryFailureLogs",
+    "AegPublishFailureLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Network/dnsResolverPolicies": [
+    "AzureActivity",
+    "DNSQueryLogs"
+  ],
+  "Microsoft.EventGrid/partnerNamespaces": [
+    "AegDataPlaneRequests",
+    "AegPublishFailureLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.StorageMover/storageMovers": [
+    "AzureActivity",
+    "AzureMetrics",
+    "StorageMoverCopyLogsFailed",
+    "StorageMoverCopyLogsTransferred",
+    "StorageMoverJobRunLogs"
+  ],
+  "Microsoft.Communication/CommunicationServices": [
+    "ACSAdvancedMessagingOperations",
+    "ACSAuthIncomingOperations",
+    "ACSBillingUsage",
+    "ACSCallAutomationIncomingOperations",
+    "ACSCallAutomationMediaSummary",
+    "ACSCallAutomationStreamingUsage",
+    "ACSCallClientMediaStatsTimeSeries",
+    "ACSCallClientOperations",
+    "ACSCallClientServiceRequestAndOutcome",
+    "ACSCallClosedCaptionsSummary",
+    "ACSCallDiagnostics",
+    "ACSCallDiagnosticsUpdates",
+    "ACSCallingMetrics",
+    "ACSCallRecordingIncomingOperations",
+    "ACSCallRecordingSummary",
+    "ACSCallSummary",
+    "ACSCallSummaryUpdates",
+    "ACSCallSurvey",
+    "ACSChatIncomingOperations",
+    "ACSEmailSendMailOperational",
+    "ACSEmailStatusUpdateOperational",
+    "ACSEmailUserEngagementOperational",
+    "ACSJobRouterIncomingOperations",
+    "ACSOptOutManagementOperations",
+    "ACSRoomsIncomingOperations",
+    "ACSSMSIncomingOperations",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.AzureMonitorDiagnosticsAgents/DataCollection": [
+    "DataSetOutput",
+    "DataSetRuns",
+    "PerfInsightsFindings",
+    "PerfInsightsImpactedResources",
+    "PerfInsightsRun"
+  ],
+  "Microsoft.Synapse/workspaces": [
+    "AzureActivity",
+    "AzureMetrics",
+    "SQLSecurityAuditEvents",
+    "SynapseBigDataPoolApplicationsEnded",
+    "SynapseBuiltinSqlPoolRequestsEnded",
+    "SynapseDXCommand",
+    "SynapseDXFailedIngestion",
+    "SynapseDXIngestionBatching",
+    "SynapseDXQuery",
+    "SynapseDXSucceededIngestion",
+    "SynapseDXTableDetails",
+    "SynapseDXTableUsageStatistics",
+    "SynapseGatewayApiRequests",
+    "SynapseIntegrationActivityRuns",
+    "SynapseIntegrationPipelineRuns",
+    "SynapseIntegrationTriggerRuns",
+    "SynapseLinkEvent",
+    "SynapseRbacOperations",
+    "SynapseScopePoolScopeJobsEnded",
+    "SynapseScopePoolScopeJobsStateChange",
+    "SynapseSqlPoolDmsWorkers",
+    "SynapseSqlPoolExecRequests",
+    "SynapseSqlPoolRequestSteps",
+    "SynapseSqlPoolSqlRequests",
+    "SynapseSqlPoolWaits"
+  ],
+  "microsoft.analysisservices/servers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.HDInsight/Clusters": [
+    "AzureActivity",
+    "HDInsightAmbariClusterAlerts",
+    "HDInsightAmbariSystemMetrics",
+    "HDInsightGatewayAuditLogs",
+    "HDInsightHadoopAndYarnLogs",
+    "HDInsightHadoopAndYarnMetrics",
+    "HDInsightHBaseLogs",
+    "HDInsightHBaseMetrics",
+    "HDInsightHiveAndLLAPLogs",
+    "HDInsightHiveAndLLAPMetrics",
+    "HDInsightHiveQueryAppStats",
+    "HDInsightHiveTezAppStats",
+    "HDInsightJupyterNotebookEvents",
+    "HDInsightKafkaLogs",
+    "HDInsightKafkaMetrics",
+    "HDInsightOozieLogs",
+    "HDInsightRangerAuditLogs",
+    "HDInsightSecurityLogs",
+    "HDInsightSparkApplicationEvents",
+    "HDInsightSparkBlockManagerEvents",
+    "HDInsightSparkEnvironmentEvents",
+    "HDInsightSparkExecutorEvents",
+    "HDInsightSparkExtraEvents",
+    "HDInsightSparkJobEvents",
+    "HDInsightSparkLogs",
+    "HDInsightSparkSQLExecutionEvents",
+    "HDInsightSparkStageEvents",
+    "HDInsightSparkStageTaskAccumulables",
+    "HDInsightSparkTaskEvents",
+    "HDInsightStormLogs",
+    "HDInsightStormMetrics",
+    "HDInsightStormTopologyMetrics"
+  ],
+  "Microsoft.Graph/tenants": [
+    "AuditLogs",
+    "AzureActivity",
+    "SigninLogs"
+  ],
+  "Microsoft.DesktopVirtualization/workspaces": [
+    "AzureActivity",
+    "AzureMetrics",
+    "WVDCheckpoints",
+    "WVDErrors",
+    "WVDFeeds",
+    "WVDManagement"
+  ],
+  "Microsoft.Devices/ProvisioningServices": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.MachineLearningServices/workspaces": [
+    "AmlComputeClusterEvent",
+    "AmlComputeClusterNodeEvent",
+    "AmlComputeCpuGpuUtilization",
+    "AmlComputeInstanceEvent",
+    "AmlComputeJobEvent",
+    "AmlDataLabelEvent",
+    "AmlDataSetEvent",
+    "AmlDataStoreEvent",
+    "AmlDeploymentEvent",
+    "AmlEnvironmentEvent",
+    "AmlInferencingEvent",
+    "AmlModelsEvent",
+    "AmlOnlineEndpointConsoleLog",
+    "AmlOnlineEndpointEventLog",
+    "AmlOnlineEndpointTrafficLog",
+    "AmlPipelineEvent",
+    "AmlRunEvent",
+    "AmlRunStatusChangedEvent",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.Network/expressRouteCircuits": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.HealthcareApis/services": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MicrosoftHealthcareApisAuditLogs"
+  ],
+  "Microsoft.WorkloadMonitor/monitors": [
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.DocumentDB/cassandraClusters": [
+    "AzureActivity",
+    "CassandraAudit",
+    "CassandraLogs"
+  ],
+  "Microsoft.ContainerService/managedClusters": [
+    "AKSAudit",
+    "AKSAuditAdmin",
+    "AKSControlPlane",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "ContainerImageInventory",
+    "ContainerInventory",
+    "ContainerLog",
+    "ContainerLogV2",
+    "ContainerNetworkLogs",
+    "ContainerNodeInventory",
+    "ContainerServiceLog",
+    "Heartbeat",
+    "InsightsMetrics",
+    "KubeEvents",
+    "KubeMonAgentEvents",
+    "KubeNodeInventory",
+    "KubePodInventory",
+    "KubePVInventory",
+    "KubeServices",
+    "Perf",
+    "RetinaNetworkFlowLogs",
+    "Syslog"
+  ],
+  "Microsoft.Experimentation/experimentWorkspaces": [
+    "AEWAssignmentBlobLogs",
+    "AEWAuditLogs",
+    "AEWComputePipelinesLogs",
+    "AEWExperimentAssignmentSummary",
+    "AEWExperimentScorecardMetricPairs",
+    "AEWExperimentScorecards",
+    "AzureActivity"
+  ],
+  "microsoft.securityinsights": [
+    "AggregatedSecurityAlert",
+    "ASimAuditEventLogs",
+    "ASimAuthenticationEventLogs",
+    "ASimDhcpEventLogs",
+    "ASimDnsActivityLogs",
+    "ASimFileEventLogs",
+    "ASimNetworkSessionLogs",
+    "ASimProcessEventLogs",
+    "ASimRegistryEventLogs",
+    "ASimUserManagementActivityLogs",
+    "ASimWebSessionLogs",
+    "CommonSecurityLog",
+    "DnsAuditEvents",
+    "PurviewDataSensitivityLogs",
+    "SecurityAlert",
+    "SecurityEvent",
+    "SentinelBehaviorEntities",
+    "SentinelBehaviorInfo",
+    "ThreatIntelExportOperation",
+    "ThreatIntelIndicators",
+    "ThreatIntelObjects",
+    "WindowsEvent"
+  ],
+  "Microsoft.Network/frontdoors": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.AzureStackHCI/VirtualMachines": [
+    "ADAssessmentRecommendation",
+    "ADReplicationResult",
+    "AzureActivity",
+    "AzureMetrics",
+    "CommonSecurityLog",
+    "ComputerGroup",
+    "ConfigurationChange",
+    "ConfigurationData",
+    "ContainerLog",
+    "DnsEvents",
+    "DnsInventory",
+    "Event",
+    "HealthStateChangeEvent",
+    "Heartbeat",
+    "InsightsMetrics",
+    "Perf",
+    "ProtectionStatus",
+    "SecurityBaseline",
+    "SecurityBaselineSummary",
+    "SecurityEvent",
+    "SQLAssessmentRecommendation",
+    "Syslog",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary",
+    "VMBoundPort",
+    "VMComputer",
+    "VMConnection",
+    "VMProcess",
+    "W3CIISLog",
+    "WindowsFirewall",
+    "WireData"
+  ],
+  "Microsoft.Cdn/profiles": [
+    "AzureActivity",
+    "AzureDiagnostics"
+  ],
+  "Microsoft.AppLink/applinks": "MeshControlPlane",
+  "Microsoft.Insights/datacollectionrules": "DCRLogErrors",
+  "microsoft.cache/redis": [
+    "ACRConnectedClientList",
+    "ACREntraAuthenticationAuditLog",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.AzurePlaywrightService/accounts": [
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.NetworkCloud/clusters": [
+    "AzureActivity",
+    "AzureMetrics",
+    "NCCIDRACLogs",
+    "NCCKubernetesLogs",
+    "NCCPlatformOperationsLogs",
+    "NCCVMOrchestrationLogs"
+  ],
+  "Microsoft.Storage/storageAccounts": [
+    "AzureActivity",
+    "AzureMetrics",
+    "StorageBlobLogs",
+    "StorageFileLogs",
+    "StorageQueueLogs",
+    "StorageTableLogs"
+  ],
+  "Microsoft.HealthcareInterop/workspaces": "AHCIDiagnosticLogs",
+  "Microsoft.Kusto/Clusters": [
+    "ADXCommand",
+    "ADXIngestionBatching",
+    "ADXJournal",
+    "ADXQuery",
+    "ADXTableDetails",
+    "ADXTableUsageStatistics",
+    "AzureActivity",
+    "AzureMetrics",
+    "FailedIngestion",
+    "SucceededIngestion"
+  ],
+  "Microsoft.ConnectedCache/CacheNodes": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MCCEventLogs"
+  ],
+  "Microsoft.DBforPostgreSQL/serversv2": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Purview/accounts": [
+    "AzureActivity",
+    "PurviewDataSensitivityLogs",
+    "PurviewScanStatusLogs",
+    "PurviewSecurityLogs"
+  ],
+  "Microsoft.VideoIndexer/accounts": [
+    "VIAudit",
+    "VIIndexing"
+  ],
+  "Microsoft.Network/NetworkWatchers": [
+    "AzureActivity",
+    "NWConnectionMonitorDNSResult",
+    "NWConnectionMonitorPathResult",
+    "NWConnectionMonitorTestResult"
+  ],
+  "Microsoft.App/managedEnvironments": [
+    "AppEnvSessionConsoleLogs",
+    "AppEnvSessionLifecycleLogs",
+    "AppEnvSessionPoolEventLogs",
+    "AppEnvSpringAppConsoleLogs",
+    "AzureActivity",
+    "ContainerAppConsoleLogs",
+    "ContainerAppSystemLogs"
+  ],
+  "Microsoft.MachineLearningServices/registries": [
+    "AmlRegistryReadEventsLog",
+    "AmlRegistryWriteEventsLog",
+    "AzureActivity"
+  ],
+  "Microsoft.Network/virtualNetworkGateways": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Insights/WorkloadMonitoring": "InsightsMetrics",
+  "Microsoft.DevOpsInfrastructure/pools": [
+    "AzureActivity",
+    "MDPResourceLog"
+  ],
+  "Microsoft.AzureADGraph/tenants": [
+    "AADGraphActivityLogs",
+    "AuditLogs",
+    "AzureActivity"
+  ],
+  "Microsoft.Compute/virtualMachineScaleSets": [
+    "AzureActivity",
+    "AzureMetrics",
+    "CommonSecurityLog",
+    "ConfigurationChange",
+    "ConfigurationData",
+    "ContainerLog",
+    "DataSetOutput",
+    "DataSetRuns",
+    "Event",
+    "Heartbeat",
+    "InsightsMetrics",
+    "Perf",
+    "PerfInsightsFindings",
+    "PerfInsightsImpactedResources",
+    "PerfInsightsRun",
+    "ProtectionStatus",
+    "SecurityBaseline",
+    "SecurityEvent",
+    "Syslog",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary",
+    "VMBoundPort",
+    "VMComputer",
+    "VMConnection",
+    "VMProcess",
+    "W3CIISLog",
+    "WindowsFirewall",
+    "WireData"
+  ],
+  "Microsoft.Network/networkinterfaces": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.ManagedNetworkFabric/networkDevices": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MNFDeviceUpdates",
+    "MNFSystemSessionHistoryUpdates",
+    "MNFSystemStateMessageUpdates"
+  ],
+  "Microsoft.DBforPostgreSQL/servers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Logic/integrationAccounts": [
+    "AzureActivity",
+    "LIATrackingEvents"
+  ],
+  "Microsoft.Network/NetworkSecurityPerimeters": "NSPAccessLogs",
+  "Microsoft.DBForMySQL/flexibleServers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "MySqlAuditLogs",
+    "MySqlSlowLogs"
+  ],
+  "Microsoft.Media/mediaservices": [
+    "AMSKeyDeliveryRequests",
+    "AMSLiveEventOperations",
+    "AMSMediaAccountHealth",
+    "AMSStreamingEndpointRequests",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.NetworkAnalytics/DataProducts": [
+    "AOIDatabaseQuery",
+    "AOIDigestion",
+    "AOIStorage",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.AppPlatform/Spring": [
+    "AppPlatformBuildLogs",
+    "AppPlatformContainerEventLogs",
+    "AppPlatformIngressLogs",
+    "AppPlatformLogsforSpring",
+    "AppPlatformSystemLogs",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.SignalRService/WebPubSub": [
+    "AzureActivity",
+    "WebPubSubConnectivity",
+    "WebPubSubHttpRequest",
+    "WebPubSubMessaging"
+  ],
+  "Microsoft.ServiceFabric/clusters": [
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.EventHub/namespaces": [
+    "AZMSApplicationMetricLogs",
+    "AZMSArchiveLogs",
+    "AZMSAutoscaleLogs",
+    "AZMSCustomerManagedKeyUserLogs",
+    "AZMSDiagnosticErrorLogs",
+    "AZMSKafkaCoordinatorLogs",
+    "AZMSKafkaUserErrorLogs",
+    "AZMSOperationalLogs",
+    "AZMSRunTimeAuditLogs",
+    "AZMSVnetConnectionEvents",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.ApiManagement/service": [
+    "ApiManagementGatewayLlmLog",
+    "ApiManagementGatewayLogs",
+    "ApiManagementWebSocketConnectionLogs",
+    "APIMDevPortalAuditDiagnosticLog",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.DevCenter/devcenters": [
+    "AzureActivity",
+    "AzureMetrics",
+    "DevCenterAgentHealthLogs",
+    "DevCenterBillingEventLogs",
+    "DevCenterConnectionLogs",
+    "DevCenterDiagnosticLogs",
+    "DevCenterResourceOperationLogs"
+  ],
+  "Microsoft.EventGrid/domains": [
+    "AegDataPlaneRequests",
+    "AegDeliveryFailureLogs",
+    "AegPublishFailureLogs",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "microsoft.standbypool/standbyvirtualmachinepools": [
+    "SVMPoolExecutionLog",
+    "SVMPoolRequestLog"
+  ],
+  "Microsoft.Network/NetworkSecurityGroups": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.SCVMM/VirtualMachines": [
+    "ADAssessmentRecommendation",
+    "ADReplicationResult",
+    "AzureActivity",
+    "AzureMetrics",
+    "CommonSecurityLog",
+    "ComputerGroup",
+    "ConfigurationChange",
+    "ConfigurationData",
+    "ContainerLog",
+    "DnsEvents",
+    "DnsInventory",
+    "Event",
+    "HealthStateChangeEvent",
+    "Heartbeat",
+    "InsightsMetrics",
+    "Perf",
+    "ProtectionStatus",
+    "SecurityBaseline",
+    "SecurityBaselineSummary",
+    "SecurityEvent",
+    "SQLAssessmentRecommendation",
+    "Syslog",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary",
+    "VMBoundPort",
+    "VMComputer",
+    "VMConnection",
+    "VMProcess",
+    "W3CIISLog",
+    "WindowsFirewall",
+    "WireData"
+  ],
+  "Microsoft.Network/virtualNetworks": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Network/LoadBalancers": [
+    "ALBHealthEvent",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.PlayFab/titles": "PFTitleAuditLogs",
+  "Microsoft.Attestation/attestationProviders": [
+    "AzureActivity",
+    "AzureAttestationDiagnostics"
+  ],
+  "Microsoft.Dashboard/grafana": [
+    "AGSGrafanaLoginEvents",
+    "AGSGrafanaUsageInsightsEvents",
+    "AzureActivity"
+  ],
+  "Microsoft.D365CustomerInsights/instances": [
+    "AzureActivity",
+    "CIEventsAudit",
+    "CIEventsOperational"
+  ],
+  "Microsoft.Sql/servers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.NetworkCloud/bareMetalMachines": [
+    "AzureActivity",
+    "AzureMetrics",
+    "NCBMBreakGlassAuditLogs",
+    "NCBMSecurityDefenderLogs",
+    "NCBMSecurityLogs",
+    "NCBMSystemLogs"
+  ],
+  "Microsoft.DocumentDB/mongoClusters": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "VCoreMongoRequests"
+  ],
+  "Microsoft.OpenEnergyPlatform/energyServices": [
+    "OEPAirFlowTask",
+    "OEPAuditLogs",
+    "OEPDataplaneLogs",
+    "OEPElasticOperator",
+    "OEPElasticsearch"
+  ],
+  "Microsoft.DataLakeAnalytics/accounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "microsoft.intune/operations": "Windows365AuditLogs",
+  "Microsoft.NetworkCloud/storageAppliances": [
+    "AzureActivity",
+    "AzureMetrics",
+    "NCSStorageAlerts",
+    "NCSStorageAudits",
+    "NCSStorageLogs"
+  ],
+  "Microsoft.Security/Security": "SecurityAttackPathData",
+  "Microsoft.Sql/managedInstances": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.LoadTestService/loadtests": [
+    "AzureActivity",
+    "AzureLoadTestingOperation"
+  ],
+  "Microsoft.RecoveryServices/Vaults": [
+    "AddonAzureBackupAlerts",
+    "AddonAzureBackupJobs",
+    "AddonAzureBackupPolicy",
+    "AddonAzureBackupProtectedInstance",
+    "AddonAzureBackupStorage",
+    "ASRJobs",
+    "ASRReplicatedItems",
+    "AzureActivity",
+    "AzureBackupOperations",
+    "AzureDiagnostics",
+    "CoreAzureBackup"
+  ],
+  "Microsoft.Chaos/experiments": [
+    "AzureActivity",
+    "ChaosStudioExperimentEventLogs"
+  ],
+  "microsoft.aadiam/tenants": "AADB2CRequestLogs",
+  "Microsoft.OpenLogisticsPlatform/Workspaces": [
+    "OLPSupplyChainEntityOperations",
+    "OLPSupplyChainEvents"
+  ],
+  "microsoft.avs/privateClouds": [
+    "AVSEsxiFirewallSyslog",
+    "AVSEsxiSyslog",
+    "AVSNsxEdgeSyslog",
+    "AVSNsxManagerSyslog",
+    "AVSSyslog",
+    "AVSVcSyslog"
+  ],
+  "Microsoft.Network/vpnGateways": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.EventGrid/systemTopics": [
+    "AegDeliveryFailureLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.AzureDataTransfer/connections": "DataTransferOperations",
+  "Microsoft.EventGrid/partnerTopics": [
+    "AegDeliveryFailureLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.TimeSeriesInsights/environments": [
+    "AzureActivity",
+    "AzureMetrics",
+    "TSIIngress"
+  ],
+  "Microsoft.BotService/botServices": [
+    "ABSBotRequests",
+    "AzureActivity"
+  ],
+  "microsoft.powerbidedicated/capacities": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "microsoft.streamanalytics/streamingjobs": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Insights/AutoscaleSettings": [
+    "AutoscaleEvaluationsLog",
+    "AutoscaleScaleActionsLog",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.DataCollaboration/workspaces": [
+    "ACICollaborationAudit",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.Automation/AutomationAccounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "Heartbeat",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary"
+  ],
+  "Microsoft.ServiceBus/namespaces": [
+    "AZMSApplicationMetricLogs",
+    "AZMSDiagnosticErrorLogs",
+    "AZMSOperationalLogs",
+    "AZMSRunTimeAuditLogs",
+    "AZMSVnetConnectionEvents",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Security/DefenderForStorageSettings": "StorageMalwareScanningResults",
+  "Microsoft.Network/applicationGateways": [
+    "AGWAccessLogs",
+    "AGWFirewallLogs",
+    "AGWPerformanceLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Network/networkManagers": [
+    "AVNMConnectivityConfigurationChange",
+    "AVNMIPAMPoolAllocationChange",
+    "AVNMNetworkGroupMembershipChange",
+    "AVNMRuleCollectionChange",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.ToolchainOrchestrator/diagnostics": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "TOUserAudits",
+    "TOUserDiagnostics"
+  ],
+  "Microsoft.Relay/namespaces": [
+    "AZMSHybridConnectionsEvents",
+    "AZMSVnetConnectionEvents",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.Logic/workflows": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "LogicAppWorkflowRuntime"
+  ],
+  "microsoft.batch/batchaccounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.DesktopVirtualization/applicationGroups": [
+    "AzureActivity",
+    "AzureMetrics",
+    "WVDCheckpoints",
+    "WVDErrors",
+    "WVDManagement"
+  ],
+  "Microsoft.Network/trafficmanagerprofiles": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.DataFactory/factories": [
+    "ADFActivityRun",
+    "ADFPipelineRun",
+    "ADFSandboxActivityRun",
+    "ADFSandboxPipelineRun",
+    "ADFSSISIntegrationRuntimeLogs",
+    "ADFSSISPackageEventMessageContext",
+    "ADFSSISPackageEventMessages",
+    "ADFSSISPackageExecutableStatistics",
+    "ADFSSISPackageExecutionComponentPhases",
+    "ADFSSISPackageExecutionDataStatistics",
+    "ADFTriggerRun",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.SignalRService/SignalR": [
+    "AzureActivity",
+    "AzureMetrics",
+    "SignalRServiceDiagnosticLogs"
+  ],
+  "Microsoft.DBforMySQL/servers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.HealthcareApis/workspaces": [
+    "AHDSDicomAuditLogs",
+    "AHDSDicomDiagnosticLogs",
+    "AHDSMedTechDiagnosticLogs"
+  ],
+  "Microsoft.StorageCache/amlFilesytems": [
+    "AFSAuditLogs",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.Network/bastionHosts": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MicrosoftAzureBastionAuditLogs"
+  ],
+  "Microsoft.Kubernetes/connectedClusters": [
+    "ArcK8sAudit",
+    "ArcK8sAuditAdmin",
+    "ArcK8sControlPlane",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "ContainerImageInventory",
+    "ContainerInventory",
+    "ContainerLog",
+    "ContainerLogV2",
+    "ContainerNodeInventory",
+    "ContainerServiceLog",
+    "Heartbeat",
+    "InsightsMetrics",
+    "KubeEvents",
+    "KubeMonAgentEvents",
+    "KubeNodeInventory",
+    "KubePodInventory",
+    "KubePVInventory",
+    "KubeServices",
+    "Perf",
+    "Syslog"
+  ],
+  "Microsoft.DocumentDb/databaseAccounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "CDBCassandraRequests",
+    "CDBControlPlaneRequests",
+    "CDBDataPlaneRequests",
+    "CDBDataPlaneRequests15M",
+    "CDBDataPlaneRequests5M",
+    "CDBGremlinRequests",
+    "CDBMongoRequests",
+    "CDBPartitionKeyRUConsumption",
+    "CDBPartitionKeyStatistics",
+    "CDBQueryRuntimeStatistics",
+    "CDBTableApiRequests"
+  ],
+  "Microsoft.PowerBI/tenants": [
+    "PowerBIDatasetsTenant",
+    "PowerBIDatasetsWorkspace"
+  ],
+  "Microsoft.NetworkFunction/AzureTrafficCollectors": [
+    "ATCExpressRouteCircuitIpfix",
+    "ATCMicrosoftPeeringMetadata",
+    "ATCPrivatePeeringMetadata",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.StorageCache/caches": [
+    "StorageCacheOperationEvents",
+    "StorageCacheUpgradeEvents",
+    "StorageCacheWarningEvents"
+  ],
+  "Microsoft.HealthDataAIServices/deidServices": "AHDSDeidAuditLogs",
+  "Microsoft.ServiceNetworking/TrafficControllers": [
+    "AGCAccessLogs",
+    "AGCFirewallLogs",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.AppConfiguration/configurationStores": [
+    "AACAudit",
+    "AACHttpRequest",
+    "AzureActivity"
+  ],
+  "Microsoft.Cache/redisEnterprise": "REDConnectionEvents",
+  "Microsoft.Orbital/geocatalogs": [
+    "MPCIngestionLogs",
+    "OGOAuditLogs"
+  ],
+  "Microsoft.Network/PublicIpAddresses": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.OperationalInsights/Workspaces": [
+    "AzureMetrics",
+    "AzureMetricsV2",
+    "Event",
+    "LAJobLogs",
+    "LAQueryLogs",
+    "LASummaryLogs",
+    "OTelEvents",
+    "OTelLogs",
+    "OTelResources",
+    "OTelSpans",
+    "OTelTraces",
+    "OTelTracesAgent",
+    "Syslog"
+  ],
+  "Microsoft.Edge/diagnostics": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "WOUserAudits",
+    "WOUserDiagnostics"
+  ],
+  "Microsoft.OnlineExperimentation/workspaces": [
+    "AzureActivity",
+    "OEWAuditLogs",
+    "OEWExperimentAssignmentSummary",
+    "OEWExperimentScorecardMetricPairs",
+    "OEWExperimentScorecards"
+  ],
+  "Microsoft.Blockchain/blockchainMembers": [
+    "AzureActivity",
+    "AzureMetrics",
+    "BlockchainApplicationLog",
+    "BlockchainProxyLog"
+  ],
+  "Microsoft.Monitor/accounts": "AMWMetricsUsageDetails",
+  "Microsoft.Devices/IotHubs": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "InsightsMetrics"
+  ],
+  "Microsoft.HardwareSecurityModules/cloudHsmClusters": [
+    "AzureActivity",
+    "AzureMetrics",
+    "CloudHsmServiceOperationAuditLogs"
+  ],
+  "Microsoft.AzureSphere/catalogs": [
+    "ASCAuditLogs",
+    "ASCDeviceEvents"
+  ],
+  "Microsoft.KeyVault/vaults": [
+    "AZKVAuditLogs",
+    "AZKVPolicyEvaluationDetailsLogs",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.DBForPostgreSQL/flexibleServers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "PGSQLAutovacuumStats",
+    "PGSQLDbTransactionsStats",
+    "PGSQLPgBouncer",
+    "PGSQLPgStatActivitySessions",
+    "PGSQLQueryStoreRuntime",
+    "PGSQLQueryStoreWaits",
+    "PGSQLServerLogs"
+  ],
+  "Microsoft.ContainerRegistry/registries": [
+    "AzureActivity",
+    "AzureMetrics",
+    "ContainerRegistryLoginEvents",
+    "ContainerRegistryRepositoryEvents"
+  ],
+  "Microsoft.ConfidentialLedger/ManagedCCFs": "CCFApplicationLogs",
+  "microsoft.cognitiveservices/accounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.ConnectedVehicle/platformAccounts": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MCVPAuditLogs",
+    "MCVPOperationLogs"
+  ],
+  "Microsoft.ConenctedVMwarevSphere/VirtualMachines": [
+    "ADAssessmentRecommendation",
+    "ADReplicationResult",
+    "AzureActivity",
+    "AzureMetrics",
+    "CommonSecurityLog",
+    "ComputerGroup",
+    "ConfigurationChange",
+    "ConfigurationData",
+    "ContainerLog",
+    "DnsEvents",
+    "DnsInventory",
+    "Event",
+    "HealthStateChangeEvent",
+    "Heartbeat",
+    "InsightsMetrics",
+    "Perf",
+    "ProtectionStatus",
+    "SecurityBaseline",
+    "SecurityBaselineSummary",
+    "SecurityEvent",
+    "SQLAssessmentRecommendation",
+    "Syslog",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary",
+    "VMBoundPort",
+    "VMComputer",
+    "VMConnection",
+    "VMProcess",
+    "W3CIISLog",
+    "WindowsFirewall",
+    "WireData"
+  ],
+  "Microsoft.DataShare/accounts": [
+    "AzureActivity",
+    "AzureMetrics",
+    "MicrosoftDataShareReceivedSnapshotLog",
+    "MicrosoftDataShareSentSnapshotLog"
+  ],
+  "Microsoft.HybridContainerservice/Provisionedclusters": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics",
+    "ContainerImageInventory",
+    "ContainerInventory",
+    "ContainerLog",
+    "ContainerLogV2",
+    "ContainerNodeInventory",
+    "ContainerServiceLog",
+    "Heartbeat",
+    "InsightsMetrics",
+    "KubeEvents",
+    "KubeMonAgentEvents",
+    "KubeNodeInventory",
+    "KubePodInventory",
+    "KubePVInventory",
+    "KubeServices",
+    "Perf",
+    "Syslog"
+  ],
+  "Microsoft.DesktopVirtualization/hostPools": [
+    "AzureActivity",
+    "AzureMetrics",
+    "WVDAgentHealthStatus",
+    "WVDAutoscaleEvaluationPooled",
+    "WVDCheckpoints",
+    "WVDConnectionGraphicsDataPreview",
+    "WVDConnectionNetworkData",
+    "WVDConnections",
+    "WVDErrors",
+    "WVDHostRegistrations",
+    "WVDManagement",
+    "WVDSessionHostManagement"
+  ],
+  "Microsoft.DataLakeStore/accounts": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.DBforMariaDB/servers": [
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.Compute/VirtualMachines": [
+    "ADAssessmentRecommendation",
+    "ADReplicationResult",
+    "AzureActivity",
+    "AzureMetrics",
+    "CommonSecurityLog",
+    "ComputerGroup",
+    "ConfigurationChange",
+    "ConfigurationData",
+    "ContainerLog",
+    "DataSetOutput",
+    "DataSetRuns",
+    "DnsEvents",
+    "DnsInventory",
+    "Event",
+    "HealthStateChangeEvent",
+    "Heartbeat",
+    "InsightsMetrics",
+    "Perf",
+    "PerfInsightsFindings",
+    "PerfInsightsImpactedResources",
+    "PerfInsightsRun",
+    "ProtectionStatus",
+    "SecurityBaseline",
+    "SecurityBaselineSummary",
+    "SecurityEvent",
+    "SQLAssessmentRecommendation",
+    "Syslog",
+    "Update",
+    "UpdateRunProgress",
+    "UpdateSummary",
+    "VMBoundPort",
+    "VMComputer",
+    "VMConnection",
+    "VMProcess",
+    "W3CIISLog",
+    "WindowsFirewall",
+    "WireData"
+  ],
+  "Microsoft.Network/azureFirewalls": [
+    "AZFWApplicationRule",
+    "AZFWApplicationRuleAggregation",
+    "AZFWDnsFlowTrace",
+    "AZFWDnsQuery",
+    "AZFWFatFlow",
+    "AZFWFlowTrace",
+    "AZFWIdpsSignature",
+    "AZFWInternalFqdnResolutionFailure",
+    "AZFWNatRule",
+    "AZFWNatRuleAggregation",
+    "AZFWNetworkRule",
+    "AZFWNetworkRuleAggregation",
+    "AZFWThreatIntel",
+    "AzureActivity",
+    "AzureDiagnostics",
+    "AzureMetrics"
+  ],
+  "Microsoft.AzureStackHCI/clusters": [
+    "Event",
+    "Perf"
+  ],
+  "Microsoft.NetworkCloud/clusterManagers": [
+    "AzureActivity",
+    "AzureMetrics",
+    "NCMClusterOperationsLogs"
+  ],
+  "Microsoft.DigitalTwins/digitalTwinsInstances": [
+    "ADTDataHistoryOperation",
+    "ADTDigitalTwinsOperation",
+    "ADTEventRoutesOperation",
+    "ADTModelsOperation",
+    "ADTQueryOperation",
+    "AzureActivity"
+  ],
+  "microsoft.insights/components": [
+    "AppAvailabilityResults",
+    "AppBrowserTimings",
+    "AppDependencies",
+    "AppEvents",
+    "AppExceptions",
+    "AppMetrics",
+    "AppPageViews",
+    "AppPerformanceCounters",
+    "AppRequests",
+    "AppSystemEvents",
+    "AppTraces",
+    "AzureActivity"
+  ],
+  "Microsoft.AAD/domainServices": [
+    "AADDomainServicesAccountLogon",
+    "AADDomainServicesAccountManagement",
+    "AADDomainServicesDirectoryServiceAccess",
+    "AADDomainServicesDNSAuditsDynamicUpdates",
+    "AADDomainServicesDNSAuditsGeneral",
+    "AADDomainServicesLogonLogoff",
+    "AADDomainServicesPolicyChange",
+    "AADDomainServicesPrivilegeUse",
+    "AADDomainServicesSystemSecurity",
+    "AzureActivity",
+    "AzureMetrics"
+  ],
+  "Microsoft.Databricks/workspaces": [
+    "AzureActivity",
+    "AzureMetrics",
+    "DatabricksAccounts",
+    "DatabricksApps",
+    "DatabricksBrickStoreHttpGateway",
+    "DatabricksBudgetPolicyCentral",
+    "DatabricksCloudStorageMetadata",
+    "DatabricksClusterPolicies",
+    "DatabricksClusters",
+    "DatabricksDashboards",
+    "DatabricksDatabricksSQL",
+    "DatabricksDataMonitoring",
+    "DatabricksDataRooms",
+    "DatabricksDBFS",
+    "DatabricksFeatureStore",
+    "DatabricksFiles",
+    "DatabricksFilesystem",
+    "DatabricksGenie",
+    "DatabricksGitCredentials",
+    "DatabricksGlobalInitScripts",
+    "DatabricksGroups",
+    "DatabricksIAMRole",
+    "DatabricksIngestion",
+    "DatabricksInstancePools",
+    "DatabricksJobs",
+    "DatabricksLakeviewConfig",
+    "DatabricksLineageTracking",
+    "DatabricksMarketplaceConsumer",
+    "DatabricksMarketplaceProvider",
+    "DatabricksMLflowAcledArtifact",
+    "DatabricksMLflowExperiment",
+    "DatabricksNotebook",
+    "DatabricksOnlineTables",
+    "DatabricksPredictiveOptimization",
+    "DatabricksRBAC",
+    "DatabricksRemoteHistoryService",
+    "DatabricksRFA",
+    "DatabricksSecrets",
+    "DatabricksSQL",
+    "DatabricksSQLPermissions",
+    "DatabricksSSH",
+    "DatabricksTables",
+    "DatabricksVectorSearch",
+    "DatabricksWebhookNotifications",
+    "DatabricksWebTerminal",
+    "DatabricksWorkspace",
+    "DatabricksWorkspaceFiles"
+  ],
+  "Microsoft.ConfidentialLedger/Ledgers": [
+    "ACLTransactionLogs",
+    "ACLUserDefinedLogs"
+  ],
+  "Microsoft.DataReplication/ReplicationVaults": [
+    "ASRv2HealthEvents",
+    "ASRv2JobEvents",
+    "ASRv2ProtectedItems",
+    "ASRv2ReplicationExtensions",
+    "ASRv2ReplicationPolicies",
+    "ASRv2ReplicationVaults"
+  ],
+  "microsoft.standbypool/standbycontainergrouppools": [
+    "SCGPoolExecutionLog",
+    "SCGPoolRequestLog"
+  ]
+}

@@ -1,196 +1,472 @@
-# Azure Diagnostic Settings Audit - Enhanced Version with Dynamic Table Mapping
-# Features: Subscription selection, filtered results, and accurate table name mapping
+# Azure Diagnostic Settings Audit - Proper HTML Structure Parsing
+# Features: Follows exact Microsoft HTML structure using <ul>/<li> tags
 
 param(
-    [switch]$Verbose,  # Show all resources, including those without diagnostic settings
-    [string]$SubscriptionId,  # Optional: specify subscription ID directly
-    [switch]$DisableTableLookup  # Disable web lookup for table names (faster but less accurate)
+    [switch]$Verbose,
+    [string]$SubscriptionId,
+    [switch]$DisableTableLookup,
+    [switch]$RefreshCache,
+    [switch]$Debug,
+    [int]$DelayMs = 500,
+    [switch]$Validate
 )
 
-Write-Host "Azure Diagnostic Settings Audit Tool" -ForegroundColor Green
-Write-Host "=====================================" -ForegroundColor Green
+Write-Host "Azure Diagnostic Settings Audit Tool - HTML Structure Parser Edition" -ForegroundColor Green
+Write-Host "====================================================================" -ForegroundColor Green
 Write-Host ""
 
-# Global cache for table name lookups and official table list
+# Global variables
 $script:TableNameCache = @{}
-$script:OfficialTableList = @()
+$script:ResourceTypeToTables = @{}
+$script:CacheFile = "azure_resourcetype_tables_cache.json"
+$script:ValidationErrors = @()
 
-# Function to fetch and parse Microsoft's official table reference
-function Initialize-TableMapping {
-    Write-Host "Initializing table name mapping from Microsoft documentation..." -ForegroundColor Yellow
+function Write-ValidationError {
+    param([string]$Message)
+    $script:ValidationErrors += $Message
+    Write-Warning "VALIDATION: $Message"
+}
+
+function Test-TableNameValidity {
+    param([string]$TableName)
     
+    if ([string]::IsNullOrWhiteSpace($TableName)) {
+        return $false
+    }
+    
+    if ($TableName.Length -lt 3) {
+        Write-ValidationError "Table name too short: '$TableName'"
+        return $false
+    }
+    
+    if ($TableName -notmatch '^[A-Za-z][A-Za-z0-9_]*$') {
+        Write-ValidationError "Invalid table name format: '$TableName'"
+        return $false
+    }
+    
+    # Check for corruption patterns (single characters, etc.)
+    $corruptionPatterns = @('^[A-Za-z]$', '^[A-Za-z][A-Za-z]$', '^\d+$')
+    foreach ($pattern in $corruptionPatterns) {
+        if ($TableName -match $pattern) {
+            Write-ValidationError "Suspicious table name pattern: '$TableName'"
+            return $false
+        }
+    }
+    
+    return $true
+}
+
+function Get-WebContent {
+    param([string]$Url)
+    
+    $maxRetries = 3
+    $retryDelay = 2000
+    
+    for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+        try {
+            if ($Debug) {
+                Write-Host "Debug: Fetching URL (attempt $attempt): $Url" -ForegroundColor Gray
+            }
+            
+            $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 45 -ErrorAction Stop
+            
+            if ($response.Content.Length -lt 1000) {
+                Write-Warning "Response too small, might be truncated"
+                if ($attempt -lt $maxRetries) {
+                    Start-Sleep -Milliseconds $retryDelay
+                    continue
+                }
+            }
+            
+            Start-Sleep -Milliseconds $DelayMs
+            return $response.Content
+            
+        } catch {
+            Write-Warning "Attempt $attempt failed: $($_.Exception.Message)"
+            if ($attempt -lt $maxRetries) {
+                Start-Sleep -Milliseconds $retryDelay
+            }
+        }
+    }
+    
+    return $null
+}
+
+# NEW: Proper HTML structure parser following Microsoft's <ul>/<li> format
+function Get-ResourceTypeTableMapping {
+    param([string]$HtmlContent)
+    
+    if ($Debug) {
+        Write-Host "Debug: Starting proper HTML structure parsing using <ul>/<li> tags..." -ForegroundColor Gray
+        Write-Host "Debug: HTML content length: $($HtmlContent.Length) characters" -ForegroundColor Gray
+    }
+    
+    if ([string]::IsNullOrWhiteSpace($HtmlContent) -or $HtmlContent.Length -lt 1000) {
+        Write-ValidationError "HTML content is empty or too small"
+        return @{}
+    }
+    
+    $resourceTypeMapping = @{}
+    
+    # Clean HTML
+    $HtmlContent = $HtmlContent -replace '<script[^>]*>.*?</script>', ''
+    $HtmlContent = $HtmlContent -replace '<style[^>]*>.*?</style>', ''
+    
+    Write-Host "  -> Using proper HTML structure: <h2/h3> -> <ul> -> <li><a href='tables/...'>" -ForegroundColor Yellow
+    
+    # Step 1: Find all service sections (headers followed by content)
+    $sectionPattern = '<h[23][^>]*[^>]*>([^<]+)</h[23]>(.*?)(?=<h[23]|$)'
+    $sectionMatches = [regex]::Matches($HtmlContent, $sectionPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline -bor [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+    
+    if ($Debug) {
+        Write-Host "Debug: Found $($sectionMatches.Count) service sections to process" -ForegroundColor DarkGray
+    }
+    
+    foreach ($sectionMatch in $sectionMatches) {
+        $sectionTitle = $sectionMatch.Groups[1].Value.Trim() -replace '<[^>]+>', '' -replace '&amp;', '&'
+        $sectionContent = $sectionMatch.Groups[2].Value
+        
+        # Skip navigation sections
+        if ($sectionTitle -match "^(In this article|Feedback|Table of contents|Skip|Additional resources|Contents|Exit)") {
+            continue
+        }
+        
+        if ($Debug) {
+            Write-Host "Debug: Processing service section: '$sectionTitle'" -ForegroundColor DarkGray
+        }
+        
+        # Step 2: Look for ResourceType identifiers in this section
+        $resourceTypes = @()
+        
+        # Direct ResourceType pattern matching
+        $resourceTypePattern = '(Microsoft\.[A-Za-z][A-Za-z0-9]*(?:/[a-zA-Z][a-zA-Z0-9]*)?)'
+        $resourceTypeMatches = [regex]::Matches($sectionContent, $resourceTypePattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+        
+        foreach ($rtMatch in $resourceTypeMatches) {
+            $resourceType = $rtMatch.Groups[1].Value
+            if ($resourceTypes -notcontains $resourceType) {
+                $resourceTypes += $resourceType
+                if ($Debug) {
+                    Write-Host "Debug:   Found ResourceType: '$resourceType'" -ForegroundColor DarkGray
+                }
+            }
+        }
+        
+        # Step 3: Infer ResourceType from service name if not found directly
+        if ($resourceTypes.Count -eq 0) {
+            $inferredResourceType = ""
+            switch -Regex ($sectionTitle) {
+                "PlayFab|Azure PlayFab" { $inferredResourceType = "Microsoft.PlayFab/titles" }
+                "API Management|APIM" { $inferredResourceType = "Microsoft.ApiManagement/service" }
+                "Logic Apps" { $inferredResourceType = "Microsoft.Logic/workflows" }
+                "Storage|Azure Storage" { $inferredResourceType = "Microsoft.Storage/storageAccounts" }
+                "App Service|Web Apps" { $inferredResourceType = "Microsoft.Web/sites" }
+                "Operational Insights|Log Analytics" { $inferredResourceType = "Microsoft.OperationalInsights/workspaces" }
+                "Key Vault" { $inferredResourceType = "Microsoft.KeyVault/vaults" }
+                "Sentinel|Azure Sentinel" { $inferredResourceType = "microsoft.securityinsights" }
+                "Data Collection|Insights" { $inferredResourceType = "Microsoft.Insights/dataCollectionRules" }
+                "Network|Virtual Network" { $inferredResourceType = "Microsoft.Network/virtualNetworks" }
+                "Load Balancer" { $inferredResourceType = "Microsoft.Network/LoadBalancers" }
+                "Attestation" { $inferredResourceType = "Microsoft.Attestation/attestationProviders" }
+            }
+            
+            if ($inferredResourceType) {
+                $resourceTypes += $inferredResourceType
+                if ($Debug) {
+                    Write-Host "Debug:   Inferred ResourceType: '$inferredResourceType' from section '$sectionTitle'" -ForegroundColor DarkGray
+                }
+            }
+        }
+        
+        # Step 4: Extract tables using proper <ul>/<li> structure
+        $tablesInSection = @()
+        
+        # Find all <ul> blocks in this section
+        $ulPattern = '<ul[^>]*>(.*?)</ul>'
+        $ulMatches = [regex]::Matches($sectionContent, $ulPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline -bor [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+        
+        if ($Debug -and $ulMatches.Count -gt 0) {
+            Write-Host "Debug:   Found $($ulMatches.Count) <ul> blocks in this section" -ForegroundColor DarkGray
+        }
+        
+        foreach ($ulMatch in $ulMatches) {
+            $ulContent = $ulMatch.Groups[1].Value
+            
+            # Extract <li><a href="tables/...">TableName</a></li> entries
+            $liPattern = '<li[^>]*>.*?<a[^>]+href="tables/([^"]+)"[^>]*>([^<]+)</a>.*?</li>'
+            $liMatches = [regex]::Matches($ulContent, $liPattern, [System.Text.RegularExpressions.RegexOptions]::Singleline -bor [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            
+            if ($Debug -and $liMatches.Count -gt 0) {
+                Write-Host "Debug:     <ul> contains $($liMatches.Count) table entries" -ForegroundColor DarkGray
+            }
+            
+            foreach ($liMatch in $liMatches) {
+                $tableUrl = $liMatch.Groups[1].Value.Trim()
+                $tableName = $liMatch.Groups[2].Value.Trim()
+                
+                # Validate and add table
+                if (Test-TableNameValidity -TableName $tableName) {
+                    if ($tablesInSection -notcontains $tableName) {
+                        $tablesInSection += $tableName
+                        if ($Debug) {
+                            Write-Host "Debug:       Valid table: '$tableName'" -ForegroundColor Green
+                        }
+                    }
+                } else {
+                    if ($Debug) {
+                        Write-Host "Debug:       Invalid table rejected: '$tableName'" -ForegroundColor Red
+                    }
+                }
+            }
+        }
+        
+        # Step 5: Fallback - if no <ul> structure, try direct links
+        if ($tablesInSection.Count -eq 0) {
+            $directLinkPattern = '<a[^>]+href="tables/([^"]+)"[^>]*>([^<]+)</a>'
+            $directMatches = [regex]::Matches($sectionContent, $directLinkPattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            
+            if ($Debug -and $directMatches.Count -gt 0) {
+                Write-Host "Debug:   Fallback: Found $($directMatches.Count) direct table links" -ForegroundColor DarkGray
+            }
+            
+            foreach ($directMatch in $directMatches) {
+                $tableName = $directMatch.Groups[2].Value.Trim()
+                if (Test-TableNameValidity -TableName $tableName) {
+                    if ($tablesInSection -notcontains $tableName) {
+                        $tablesInSection += $tableName
+                        if ($Debug) {
+                            Write-Host "Debug:     Fallback table: '$tableName'" -ForegroundColor DarkGray
+                        }
+                    }
+                }
+            }
+        }
+        
+        # Step 6: Associate ResourceTypes with tables from this section
+        if ($tablesInSection.Count -gt 0 -and $resourceTypes.Count -gt 0) {
+            foreach ($resourceType in $resourceTypes) {
+                if (-not $resourceTypeMapping.ContainsKey($resourceType)) {
+                    $resourceTypeMapping[$resourceType] = @()
+                }
+                
+                foreach ($table in $tablesInSection) {
+                    if ($resourceTypeMapping[$resourceType] -notcontains $table) {
+                        $resourceTypeMapping[$resourceType] += $table
+                    }
+                }
+            }
+            
+            if ($Debug) {
+                Write-Host "Debug:   Mapped $($resourceTypes.Count) ResourceTypes to $($tablesInSection.Count) tables" -ForegroundColor Green
+                foreach ($rt in $resourceTypes) {
+                    Write-Host "Debug:     $rt -> $($tablesInSection -join ', ')" -ForegroundColor DarkGray
+                }
+            }
+        } elseif ($tablesInSection.Count -gt 0) {
+            if ($Debug) {
+                Write-Host "Debug:   Found $($tablesInSection.Count) tables but no ResourceType for section '$sectionTitle'" -ForegroundColor Yellow
+            }
+        }
+        
+        # Add delay between sections
+        Start-Sleep -Milliseconds ($DelayMs / 4)
+    }
+    
+    # Step 7: Add critical known mappings to ensure key ResourceTypes are covered
+    $knownMappings = @{
+        'Microsoft.Logic/workflows' = @('LogicAppWorkflowRuntime', 'LogicAppWorkflowEvent')
+        'Microsoft.PlayFab/titles' = @('PFTitleAuditLogs')
+        'Microsoft.OperationalInsights/workspaces' = @('LAQueryLogs', 'Usage')
+        'Microsoft.Storage/storageAccounts' = @('StorageBlobLogs', 'StorageQueueLogs', 'StorageTableLogs')
+        'Microsoft.Web/sites' = @('AppServiceHTTPLogs', 'AppServiceConsoleLogs')
+        'Microsoft.Insights/dataCollectionRules' = @('DCRLogErrors', 'Usage')
+    }
+    
+    foreach ($knownType in $knownMappings.Keys) {
+        if (-not $resourceTypeMapping.ContainsKey($knownType)) {
+            $resourceTypeMapping[$knownType] = $knownMappings[$knownType]
+            if ($Debug) {
+                Write-Host "Debug: Added known mapping: $knownType -> $($knownMappings[$knownType] -join ', ')" -ForegroundColor Cyan
+            }
+        }
+    }
+    
+    # Step 8: Final cleanup and validation
+    $finalMapping = @{}
+    foreach ($resourceType in $resourceTypeMapping.Keys) {
+        $validTables = $resourceTypeMapping[$resourceType] | Where-Object { Test-TableNameValidity -TableName $_ } | Sort-Object | Get-Unique
+        if ($validTables.Count -gt 0) {
+            $finalMapping[$resourceType] = $validTables
+        }
+    }
+    
+    Write-Host "  -> Successfully parsed $($finalMapping.Keys.Count) resource types using structured HTML parsing" -ForegroundColor Green
+    
+    if ($Debug) {
+        Write-Host "Debug: Final mapping summary (first 10):" -ForegroundColor Gray
+        $finalMapping.Keys | Sort-Object | Select-Object -First 10 | ForEach-Object {
+            Write-Host "Debug:   $_ -> $($finalMapping[$_] -join ', ')" -ForegroundColor DarkGray
+        }
+    }
+    
+    return $finalMapping
+}
+
+function Initialize-ResourceTypeMapping {
+    Write-Host "Initializing ResourceType-based table mapping with structured HTML parsing..." -ForegroundColor Yellow
+    
+    # Check cache first
+    if (-not $RefreshCache -and (Test-Path $script:CacheFile)) {
+        try {
+            $cacheAge = (Get-Date) - (Get-Item $script:CacheFile).LastWriteTime
+            if ($cacheAge.TotalHours -lt 24) {
+                Write-Host "  -> Loading cached ResourceType mappings..." -ForegroundColor Green
+                $cachedData = Get-Content $script:CacheFile | ConvertFrom-Json
+                
+                $validCacheData = $true
+                if (-not $cachedData -or -not $cachedData.PSObject.Properties) {
+                    $validCacheData = $false
+                }
+                
+                if ($validCacheData) {
+                    $script:ResourceTypeToTables = @{}
+                    $cachedData.PSObject.Properties | ForEach-Object {
+                        $validTables = $_.Value | Where-Object { Test-TableNameValidity -TableName $_ }
+                        if ($validTables.Count -gt 0) {
+                            $script:ResourceTypeToTables[$_.Name] = $validTables
+                        }
+                    }
+                    
+                    if ($script:ResourceTypeToTables.Keys.Count -gt 0) {
+                        Write-Host "  -> Loaded and validated mappings for $($script:ResourceTypeToTables.Keys.Count) resource types" -ForegroundColor Green
+                        return $true
+                    }
+                }
+            } else {
+                Write-Host "  -> Cache is stale, fetching fresh data..." -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Warning "Cache error: $($_.Exception.Message)"
+        }
+    }
+    
+    # Fetch fresh data
     try {
-        # Fetch the official table reference page
-        $response = Invoke-WebRequest -Uri "https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables-category" -UseBasicParsing -TimeoutSec 30
+        Write-Host "  -> Fetching Microsoft documentation with structured parsing..." -ForegroundColor Yellow
+        $tablesIndexUrl = "https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables-index"
         
-        # Parse table names from the content using regex
-        $tablePattern = 'tables/([a-zA-Z0-9_]+)\)'
-        $matches = [regex]::Matches($response.Content, $tablePattern)
+        $response = Get-WebContent -Url $tablesIndexUrl
         
-        $script:OfficialTableList = $matches | ForEach-Object { $_.Groups[1].Value } | Sort-Object | Get-Unique
+        if (-not $response) {
+            Write-ValidationError "Could not fetch Microsoft documentation"
+            return $false
+        }
         
-        Write-Host "  -> Found $($script:OfficialTableList.Count) official Log Analytics tables" -ForegroundColor Green
+        # Parse using the new structured approach
+        $script:ResourceTypeToTables = Get-ResourceTypeTableMapping -HtmlContent $response
+        
+        if ($script:ResourceTypeToTables.Keys.Count -eq 0) {
+            Write-ValidationError "No ResourceType mappings extracted"
+            return $false
+        }
+        
+        # Cache results
+        $script:ResourceTypeToTables | ConvertTo-Json -Depth 10 | Out-File $script:CacheFile -Encoding UTF8
+        
+        Write-Host "  -> Successfully mapped $($script:ResourceTypeToTables.Keys.Count) resource types" -ForegroundColor Green
         return $true
         
     } catch {
-        Write-Warning "Could not fetch official table reference: $($_.Exception.Message)"
-        Write-Host "  -> Using fallback table mapping only" -ForegroundColor Yellow
+        Write-ValidationError "Failed to initialize ResourceType mapping: $($_.Exception.Message)"
         return $false
     }
 }
 
-# Enhanced function to map diagnostic category names to actual Log Analytics table names
 function Get-LogAnalyticsTableName {
     param(
         [string]$CategoryName,
-        [string]$ResourceType
+        [string]$ResourceType,
+        [string]$CategoryType
     )
     
-    # Check cache first
-    $cacheKey = "$CategoryName|$ResourceType"
+    # Handle metrics
+    if ($CategoryType -eq "Metrics") {
+        return "AzureMetrics"
+    }
+    
+    # Validate inputs
+    if ([string]::IsNullOrWhiteSpace($CategoryName) -or [string]::IsNullOrWhiteSpace($ResourceType)) {
+        return "Unknown (invalid input)"
+    }
+    
+    # Check cache
+    $cacheKey = "$ResourceType|$CategoryName"
     if ($script:TableNameCache.ContainsKey($cacheKey)) {
-        return $script:TableNameCache[$cacheKey]
+        $cachedResult = $script:TableNameCache[$cacheKey]
+        if (Test-TableNameValidity -TableName $cachedResult -or $cachedResult.StartsWith("Unknown")) {
+            return $cachedResult
+        } else {
+            $script:TableNameCache.Remove($cacheKey)
+            Write-ValidationError "Removed invalid cached result for '$cacheKey': '$cachedResult'"
+        }
     }
     
-    $tableName = $null
+    $result = "Unknown"
     
-    # Try to find exact or pattern-based matches in the official table list
-    if ($script:OfficialTableList.Count -gt 0) {
+    if ($script:ResourceTypeToTables.ContainsKey($ResourceType)) {
+        $availableTables = $script:ResourceTypeToTables[$ResourceType]
         
-        # Direct matches (case-insensitive)
-        $exactMatch = $script:OfficialTableList | Where-Object { $_ -ieq $CategoryName }
+        if ($Debug) {
+            Write-Host "Debug: Mapping $ResourceType category '$CategoryName'" -ForegroundColor DarkGray
+            Write-Host "Debug:   Available tables: $($availableTables -join ', ')" -ForegroundColor DarkGray
+        }
+        
+        # Exact match
+        $exactMatch = $availableTables | Where-Object { $_ -eq $CategoryName }
         if ($exactMatch) {
-            $tableName = $exactMatch
+            $result = $exactMatch
+            if ($Debug) {
+                Write-Host "Debug:   Exact match: $result" -ForegroundColor DarkGray
+            }
         }
-        
-        # Pattern-based matching for common transformations
-        if (-not $tableName) {
-            
-            # Common prefixes and patterns
-            $patterns = @(
-                "DCR$CategoryName",           # Data Collection Rules: LogErrors -> DCRLogErrors
-                "LA$CategoryName",            # Log Analytics: SummaryLogs -> LASummaryLogs, QueryLogs -> LAQueryLogs
-                "$CategoryName" + "Logs",     # Category + Logs: Storage -> StorageLogs
-                "Container$CategoryName",     # Container logs
-                "AppService$CategoryName",    # App Service logs
-                "Storage$CategoryName",       # Storage logs
-                "CDB$CategoryName"           # Cosmos DB: DataPlaneRequests -> CDBDataPlaneRequests
-            )
-            
-            foreach ($pattern in $patterns) {
-                $match = $script:OfficialTableList | Where-Object { $_ -ieq $pattern }
-                if ($match) {
-                    $tableName = $match
-                    break
+        # Contains match
+        else {
+            $containsMatches = $availableTables | Where-Object { $_ -like "*$CategoryName*" }
+            if ($containsMatches.Count -eq 1) {
+                $result = $containsMatches[0]
+                if ($Debug) {
+                    Write-Host "Debug:   Unique contains match: $result" -ForegroundColor DarkGray
+                }
+            } elseif ($containsMatches.Count -gt 1) {
+                $result = $containsMatches | Sort-Object Length | Select-Object -First 1
+                if ($Debug) {
+                    Write-Host "Debug:   Best contains match: $result" -ForegroundColor DarkGray
+                }
+            } else {
+                $result = "Unknown (category '$CategoryName' not found in tables for $ResourceType)"
+                if ($Debug) {
+                    Write-Host "Debug:   No match found" -ForegroundColor DarkGray
                 }
             }
         }
-        
-        # Resource-specific pattern matching
-        if (-not $tableName) {
-            switch -Regex ($ResourceType) {
-                'Microsoft\.Storage' {
-                    # Storage patterns
-                    if ($CategoryName -match 'Storage(Read|Write|Delete)') {
-                        $tableName = $script:OfficialTableList | Where-Object { $_ -ieq 'StorageBlobLogs' }
-                    }
-                }
-                'Microsoft\.DocumentDB' {
-                    # Cosmos DB patterns
-                    $cosmosPattern = "CDB$CategoryName"
-                    $tableName = $script:OfficialTableList | Where-Object { $_ -ieq $cosmosPattern }
-                }
-                'Microsoft\.Web' {
-                    # App Service patterns
-                    $appServicePattern = "AppService$CategoryName"
-                    $tableName = $script:OfficialTableList | Where-Object { $_ -ieq $appServicePattern }
-                }
-                'Microsoft\.ContainerRegistry' {
-                    # Container Registry patterns
-                    $containerPattern = "ContainerRegistry$CategoryName"
-                    $tableName = $script:OfficialTableList | Where-Object { $_ -ieq $containerPattern }
-                }
-            }
+    } else {
+        $result = "Unknown (ResourceType '$ResourceType' not in documentation)"
+        if ($Debug) {
+            Write-Host "Debug: ResourceType '$ResourceType' not found" -ForegroundColor DarkGray
         }
     }
     
-    # Fallback to intelligent defaults if no official match found
-    if (-not $tableName) {
-        $tableName = Get-FallbackTableName -CategoryName $CategoryName -ResourceType $ResourceType
+    # Validate and cache result
+    if (Test-TableNameValidity -TableName $result -or $result.StartsWith("Unknown")) {
+        $script:TableNameCache[$cacheKey] = $result
+    } else {
+        Write-ValidationError "Invalid mapping result for '$cacheKey': '$result'"
+        $result = "Unknown (validation failed)"
+        $script:TableNameCache[$cacheKey] = $result
     }
     
-    # Cache the result
-    $script:TableNameCache[$cacheKey] = $tableName
-    return $tableName
-}
-
-# Fallback function for when official lookup fails
-function Get-FallbackTableName {
-    param(
-        [string]$CategoryName,
-        [string]$ResourceType
-    )
-    
-    # Apply intelligent defaults based on known patterns
-    switch -Regex ($ResourceType) {
-        'Microsoft\.Storage' {
-            if ($CategoryName -match 'Storage(Read|Write|Delete)') {
-                return 'StorageBlobLogs'
-            }
-            return "Storage$($CategoryName)Logs"
-        }
-        'Microsoft\.Logic' {
-            return 'AzureDiagnostics'  # Logic Apps typically use AzureDiagnostics
-        }
-        'Microsoft\.KeyVault' {
-            if ($CategoryName -eq 'AuditEvent') {
-                return 'KeyVaultLogs'
-            }
-            return 'AzureDiagnostics'
-        }
-        'Microsoft\.Web' {
-            if ($CategoryName -like 'AppService*') {
-                return $CategoryName  # App Service table names usually match category names
-            }
-            return "AppService$CategoryName"
-        }
-        'Microsoft\.Sql' {
-            return 'AzureDiagnostics'  # SQL typically uses AzureDiagnostics
-        }
-        'Microsoft\.Network' {
-            return 'AzureDiagnostics'  # Network resources typically use AzureDiagnostics
-        }
-        'Microsoft\.DocumentDB' {
-            return "CDB$CategoryName"  # Cosmos DB uses CDB prefix
-        }
-        'Microsoft\.EventHub' {
-            return 'AzureDiagnostics'
-        }
-        'Microsoft\.ServiceBus' {
-            return 'AzureDiagnostics'
-        }
-        'Microsoft\.Insights' {
-            # Data Collection Rules
-            if ($CategoryName -like '*Errors' -or $CategoryName -like '*Error*') {
-                return "DCR$CategoryName"
-            }
-            if ($CategoryName -like '*Logs' -or $CategoryName -like '*Log*') {
-                return "LA$CategoryName"
-            }
-        }
-    }
-    
-    # Generic fallbacks
-    if ($CategoryName -match '^(Summary|Query|Audit|Job)') {
-        return "LA$CategoryName"  # Many system logs have LA prefix
-    }
-    
-    if ($CategoryName -like '*Logs' -or $CategoryName -like '*Log') {
-        return $CategoryName  # If it already has "Log" in the name, it might be the table name
-    }
-    
-    # Last resort
-    return "$CategoryName (estimated)"
+    Start-Sleep -Milliseconds ($DelayMs / 4)
+    return $result
 }
 
 # Function to select subscription
@@ -226,7 +502,7 @@ function Select-AzureSubscription {
     return $subscriptions[$selectedIndex]
 }
 
-# Authentication check
+# Authentication
 try {
     $currentContext = Get-AzContext
     if (-not $currentContext) {
@@ -238,343 +514,212 @@ try {
     Connect-AzAccount
 }
 
-# Initialize table mapping unless disabled
+# Initialize mapping
 if (-not $DisableTableLookup) {
-    $mappingSuccess = Initialize-TableMapping
+    $mappingSuccess = Initialize-ResourceTypeMapping
 } else {
     $mappingSuccess = $false
-    Write-Host "Table lookup disabled - using fallback names only" -ForegroundColor Yellow
+    Write-Host "Table lookup disabled" -ForegroundColor Yellow
+}
+
+# Validation summary
+if ($script:ValidationErrors.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Validation Issues Found:" -ForegroundColor Red
+    $script:ValidationErrors | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+}
+
+# Test problematic cases if Debug enabled
+if ($Debug -and $mappingSuccess) {
+    Write-Host ""
+    Write-Host "Testing HTML structure parsing with problematic cases:" -ForegroundColor Yellow
+    
+    $testCases = @(
+        @{ ResourceType = "Microsoft.PlayFab/titles"; Category = "AuditLogs"; Expected = "PFTitleAuditLogs" },
+        @{ ResourceType = "Microsoft.OperationalInsights/workspaces"; Category = "Audit"; Expected = "LAQueryLogs or similar" },
+        @{ ResourceType = "Microsoft.Logic/workflows"; Category = "WorkflowRuntime"; Expected = "LogicAppWorkflowRuntime" }
+    )
+    
+    foreach ($test in $testCases) {
+        Write-Host "Testing: $($test.ResourceType) + '$($test.Category)'" -ForegroundColor Cyan
+        
+        if ($script:ResourceTypeToTables.ContainsKey($test.ResourceType)) {
+            Write-Host "  Available tables: $($script:ResourceTypeToTables[$test.ResourceType] -join ', ')" -ForegroundColor Gray
+        } else {
+            Write-Host "  ResourceType not found in mapping!" -ForegroundColor Red
+        }
+        
+        $result = Get-LogAnalyticsTableName -CategoryName $test.Category -ResourceType $test.ResourceType -CategoryType "Logs"
+        Write-Host "  Result: '$result'" -ForegroundColor White
+        Write-Host "  Expected: $($test.Expected)" -ForegroundColor Gray
+        Write-Host ""
+    }
 }
 
 # Subscription selection
 if ($SubscriptionId) {
-    Write-Host "Using specified subscription ID: $SubscriptionId" -ForegroundColor Green
     $selectedSubscription = Get-AzSubscription -SubscriptionId $SubscriptionId
-    if (-not $selectedSubscription) {
-        Write-Error "Subscription $SubscriptionId not found or not accessible."
-        exit 1
-    }
 } else {
     $selectedSubscription = Select-AzureSubscription
 }
 
-# Set the subscription context
-Write-Host ""
-Write-Host "Setting subscription context to: $($selectedSubscription.Name)" -ForegroundColor Green
 Set-AzContext -SubscriptionId $selectedSubscription.Id | Out-Null
 
 Write-Host ""
 Write-Host "Audit Settings:" -ForegroundColor Cyan
 Write-Host "===============" -ForegroundColor Cyan
 Write-Host "Subscription: $($selectedSubscription.Name)"
-Write-Host "Subscription ID: $($selectedSubscription.Id)"
-Write-Host "Verbose Mode: $(if($Verbose) {'Enabled - Will show all resources'} else {'Disabled - Will only show resources with diagnostic settings'})"
-Write-Host "Table Mapping: $(if($DisableTableLookup) {'Disabled - Using fallback names only'} elseif($mappingSuccess) {'Enabled - Using official Microsoft table reference'} else {'Fallback mode - Official reference unavailable'})"
+Write-Host "ResourceType mappings loaded: $($script:ResourceTypeToTables.Keys.Count)"
+Write-Host "HTML parsing method: Structured <ul>/<li> parsing"
+Write-Host "Delay between operations: $DelayMs ms"
+Write-Host "Validation enabled: $Validate"
 Write-Host ""
 
-# Get all resources
-Write-Host "Getting all resources in subscription..." -ForegroundColor Yellow
-$startTime = Get-Date
+# Get and process resources
+Write-Host "Getting all resources..." -ForegroundColor Yellow
 $allResources = Get-AzResource
 Write-Host "Found $($allResources.Count) total resources" -ForegroundColor Green
 
-if (-not $Verbose) {
-    Write-Host "Filtering to only resources with diagnostic capabilities..." -ForegroundColor Yellow
-}
-Write-Host ""
-
-# Initialize results array
 $allResults = @()
 $processedCount = 0
-$resourcesWithDiagnostics = 0
 
-# Function to process diagnostic settings for any resource ID
 function Get-DiagnosticInfo {
     param(
         [string]$ResourceId,
         [string]$ResourceName,
         [string]$ResourceType,
         [string]$ResourceGroup,
-        [string]$ServiceType = "",
         [string]$SubscriptionName,
-        [string]$SubscriptionId,
-        [bool]$ShowProgress = $true
+        [string]$SubscriptionId
     )
     
-    $diagnosticResults = @()
-    $displayName = if ($ServiceType) { "$ResourceName ($ServiceType)" } else { $ResourceName }
-    $displayType = if ($ServiceType) { "$ResourceType/$ServiceType" } else { $ResourceType }
+    $results = @()
     
     try {
-        if ($ShowProgress) {
-            Write-Progress -Activity "Processing Resource" -Status $displayName -PercentComplete -1
-        }
-        
-        # Get available categories (suppress deprecation warnings)
+        Start-Sleep -Milliseconds $DelayMs
         $categories = Get-AzDiagnosticSettingCategory -ResourceId $ResourceId -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
         
-        if ($categories -and $categories.Count -gt 0) {
-            # Get current settings (suppress deprecation warnings)
+        if ($categories) {
+            Start-Sleep -Milliseconds ($DelayMs / 2)
             $currentSettings = Get-AzDiagnosticSetting -ResourceId $ResourceId -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
             
-            # Process log categories
-            foreach ($category in $categories | Where-Object { $_.CategoryType -eq "Logs" }) {
+            foreach ($category in $categories) {
                 $enabled = $false
                 if ($currentSettings) {
-                    $logSetting = $currentSettings.Log | Where-Object { 
-                        $_.Category -eq $category.Name -and $_.Enabled -eq $true 
-                    } | Select-Object -First 1
-                    $enabled = [bool]$logSetting
+                    if ($category.CategoryType -eq "Logs") {
+                        $setting = $currentSettings.Log | Where-Object { $_.Category -eq $category.Name -and $_.Enabled -eq $true } | Select-Object -First 1
+                    } else {
+                        $setting = $currentSettings.Metric | Where-Object { $_.Category -eq $category.Name -and $_.Enabled -eq $true } | Select-Object -First 1
+                    }
+                    $enabled = [bool]$setting
                 }
                 
-                # Get the actual table name (either lookup or fallback)
-                $logAnalyticsTable = if ($DisableTableLookup) {
-                    Get-FallbackTableName -CategoryName $category.Name -ResourceType $ResourceType
+                $tableName = if ($DisableTableLookup) {
+                    "Unknown (lookup disabled)"
                 } else {
-                    Get-LogAnalyticsTableName -CategoryName $category.Name -ResourceType $ResourceType
+                    Get-LogAnalyticsTableName -CategoryName $category.Name -ResourceType $ResourceType -CategoryType $category.CategoryType
                 }
                 
-                $diagnosticResults += [PSCustomObject]@{
+                # Final validation
+                if ($Validate -and -not $tableName.StartsWith("Unknown") -and -not (Test-TableNameValidity -TableName $tableName)) {
+                    Write-ValidationError "Invalid table name: '$tableName' for $ResourceType|$($category.Name)"
+                    $tableName = "Unknown (validation failed)"
+                }
+                
+                $results += [PSCustomObject]@{
                     SubscriptionName = $SubscriptionName
                     SubscriptionId = $SubscriptionId
-                    ResourceName = $displayName
-                    ResourceType = $displayType
+                    ResourceName = $ResourceName
+                    ResourceType = $ResourceType
                     ResourceGroup = $ResourceGroup
-                    LogCategory = $category.Name
-                    LogAnalyticsTable = $logAnalyticsTable
-                    MetricCategory = ""
+                    CategoryName = $category.Name
+                    CategoryType = $category.CategoryType
+                    LogAnalyticsTable = $tableName
                     Enabled = $enabled
                     ResourceId = $ResourceId
                 }
-            }
-            
-            # Process metric categories
-            foreach ($category in $categories | Where-Object { $_.CategoryType -eq "Metrics" }) {
-                $enabled = $false
-                if ($currentSettings) {
-                    $metricSetting = $currentSettings.Metric | Where-Object { 
-                        $_.Category -eq $category.Name -and $_.Enabled -eq $true 
-                    } | Select-Object -First 1
-                    $enabled = [bool]$metricSetting
-                }
                 
-                # For metrics, table name is usually "Metrics" unless it's a specific metric table
-                $metricTableName = if ($category.Name -eq "AllMetrics") { "AzureMetrics" } else { "$($category.Name) (Metrics)" }
-                
-                $diagnosticResults += [PSCustomObject]@{
-                    SubscriptionName = $SubscriptionName
-                    SubscriptionId = $SubscriptionId
-                    ResourceName = $displayName
-                    ResourceType = $displayType
-                    ResourceGroup = $ResourceGroup
-                    LogCategory = ""
-                    LogAnalyticsTable = $metricTableName
-                    MetricCategory = $category.Name
-                    Enabled = $enabled
-                    ResourceId = $ResourceId
-                }
-            }
-            
-            return @{
-                Results = $diagnosticResults
-                HasDiagnostics = $true
-            }
-        } else {
-            # No diagnostic settings available
-            if ($Verbose) {
-                $noDataResult = [PSCustomObject]@{
-                    SubscriptionName = $SubscriptionName
-                    SubscriptionId = $SubscriptionId
-                    ResourceName = $displayName
-                    ResourceType = $displayType
-                    ResourceGroup = $ResourceGroup
-                    LogCategory = "No diagnostic settings available"
-                    LogAnalyticsTable = "N/A"
-                    MetricCategory = ""
-                    Enabled = "N/A"
-                    ResourceId = $ResourceId
-                }
-                return @{
-                    Results = @($noDataResult)
-                    HasDiagnostics = $false
-                }
-            } else {
-                return @{
-                    Results = @()
-                    HasDiagnostics = $false
-                }
+                Start-Sleep -Milliseconds ($DelayMs / 8)
             }
         }
     } catch {
-        # Error processing this resource
-        if ($Verbose) {
-            $errorResult = [PSCustomObject]@{
-                SubscriptionName = $SubscriptionName
-                SubscriptionId = $SubscriptionId
-                ResourceName = $displayName
-                ResourceType = $displayType
-                ResourceGroup = $ResourceGroup
-                LogCategory = "Error: $($_.Exception.Message)"
-                LogAnalyticsTable = "Error"
-                MetricCategory = ""
-                Enabled = "Error"
-                ResourceId = $ResourceId
-            }
-            return @{
-                Results = @($errorResult)
-                HasDiagnostics = $false
-            }
-        } else {
-            return @{
-                Results = @()
-                HasDiagnostics = $false
-            }
+        if ($Debug) {
+            Write-Host "Debug: Error processing $ResourceName : $($_.Exception.Message)" -ForegroundColor Red
         }
     }
+    
+    return $results
 }
-
-# Process resources
-$totalResources = $allResources.Count
 
 foreach ($resource in $allResources) {
     $processedCount++
-    $percentComplete = [int](($processedCount / $totalResources) * 100)
+    Write-Progress -Activity "Processing Resources (HTML Structure Parser)" -Status "$processedCount of $($allResources.Count) - $($resource.Name)" -PercentComplete (($processedCount / $allResources.Count) * 100)
     
-    Write-Progress -Activity "Processing Resources" -Status "Resource $processedCount of $totalResources - $($resource.Name)" -PercentComplete $percentComplete
+    $results = Get-DiagnosticInfo -ResourceId $resource.ResourceId -ResourceName $resource.Name -ResourceType $resource.ResourceType -ResourceGroup $resource.ResourceGroupName -SubscriptionName $selectedSubscription.Name -SubscriptionId $selectedSubscription.Id
     
-    # Main resource processing
-    $result = Get-DiagnosticInfo -ResourceId $resource.ResourceId -ResourceName $resource.Name -ResourceType $resource.ResourceType -ResourceGroup $resource.ResourceGroupName -SubscriptionName $selectedSubscription.Name -SubscriptionId $selectedSubscription.Id -ShowProgress $false
-    
-    if ($result.HasDiagnostics -or $Verbose) {
-        $allResults += $result.Results
-        if ($result.HasDiagnostics) {
-            $resourcesWithDiagnostics++
-        }
+    if ($results.Count -gt 0) {
+        $allResults += $results
     }
     
-    # Handle special cases with sub-services
-    if ($result.HasDiagnostics) {
-        switch ($resource.ResourceType) {
-            "Microsoft.Storage/storageAccounts" {
-                $subServices = @(
-                    @{Name="blob"; Path="blobServices/default"},
-                    @{Name="file"; Path="fileServices/default"},
-                    @{Name="queue"; Path="queueServices/default"},
-                    @{Name="table"; Path="tableServices/default"}
-                )
-                
-                foreach ($subService in $subServices) {
-                    $subResourceId = "$($resource.ResourceId)/$($subService.Path)"
-                    $subResult = Get-DiagnosticInfo -ResourceId $subResourceId -ResourceName $resource.Name -ResourceType $resource.ResourceType -ResourceGroup $resource.ResourceGroupName -ServiceType $subService.Name -SubscriptionName $selectedSubscription.Name -SubscriptionId $selectedSubscription.Id -ShowProgress $false
-                    
-                    if ($subResult.HasDiagnostics -or $Verbose) {
-                        $allResults += $subResult.Results
-                    }
-                }
-            }
-            
-            "Microsoft.Sql/servers" {
-                try {
-                    $databases = Get-AzSqlDatabase -ServerName $resource.Name -ResourceGroupName $resource.ResourceGroupName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-                    foreach ($db in $databases | Where-Object { $_.DatabaseName -ne "master" }) {
-                        $dbResourceId = "$($resource.ResourceId)/databases/$($db.DatabaseName)"
-                        $dbResult = Get-DiagnosticInfo -ResourceId $dbResourceId -ResourceName $resource.Name -ResourceType $resource.ResourceType -ResourceGroup $resource.ResourceGroupName -ServiceType "database-$($db.DatabaseName)" -SubscriptionName $selectedSubscription.Name -SubscriptionId $selectedSubscription.Id -ShowProgress $false
-                        
-                        if ($dbResult.HasDiagnostics -or $Verbose) {
-                            $allResults += $dbResult.Results
-                        }
-                    }
-                } catch {
-                    # Skip SQL databases if we can't access them
-                }
-            }
-        }
-    }
-    
-    # Show progress every 20 resources
-    if ($processedCount % 20 -eq 0) {
-        $elapsed = (Get-Date) - $startTime
-        $avgPerResource = $elapsed.TotalSeconds / $processedCount
-        $estimatedRemaining = ($totalResources - $processedCount) * $avgPerResource
-        Write-Host "  Progress: $processedCount/$totalResources processed. Resources with diagnostics: $resourcesWithDiagnostics. ETA: $([int]$estimatedRemaining)s" -ForegroundColor Gray
+    if ($processedCount % 10 -eq 0) {
+        Write-Host "  Processed $processedCount resources, validation errors: $($script:ValidationErrors.Count)" -ForegroundColor Gray
     }
 }
 
-Write-Progress -Activity "Processing Resources" -Completed
+Write-Progress -Completed -Activity "Processing Resources"
 
-$endTime = Get-Date
-$duration = $endTime - $startTime
-
-Write-Host ""
-Write-Host "Processing completed!" -ForegroundColor Green
-Write-Host "Processing time: $($duration.TotalMinutes.ToString('F2')) minutes ($($duration.TotalSeconds.ToString('F2')) seconds)" -ForegroundColor Green
-Write-Host ""
-
-# Export results
+# Export and analyze results
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-$subscriptionSafe = $selectedSubscription.Name -replace '[^\w\-_]', '_'
-$modeIndicator = if ($Verbose) { "_verbose" } else { "_filtered" }
-$outputFile = "diagnostic_audit_$($subscriptionSafe)$($modeIndicator)_$timestamp.csv"
-
+$outputFile = "diagnostic_audit_html_structure_$timestamp.csv"
 $allResults | Export-Csv -Path $outputFile -NoTypeInformation
 
-# Generate summary
-$totalCategories = ($allResults | Where-Object { $_.LogCategory -ne "No diagnostic settings available" -and $_.LogCategory -notlike "Error:*" }).Count
-$enabledCategories = ($allResults | Where-Object { $_.Enabled -eq $true }).Count
-$disabledCategories = ($allResults | Where-Object { $_.Enabled -eq $false }).Count
-$errorCount = ($allResults | Where-Object { $_.LogCategory -like "Error:*" }).Count
-$noSettingsCount = ($allResults | Where-Object { $_.LogCategory -eq "No diagnostic settings available" }).Count
-
-Write-Host "Audit Results Summary:" -ForegroundColor Green
-Write-Host "=====================" -ForegroundColor Green
-Write-Host "Subscription: $($selectedSubscription.Name)"
-Write-Host "Output file: $outputFile"
-Write-Host "Total resources scanned: $totalResources"
-Write-Host "Resources with diagnostic capabilities: $resourcesWithDiagnostics" -ForegroundColor Cyan
-Write-Host "Total diagnostic categories found: $totalCategories"
-Write-Host "Currently enabled: $enabledCategories" -ForegroundColor Green
-Write-Host "Currently disabled: $disabledCategories" -ForegroundColor Red
-if ($Verbose) {
-    Write-Host "Resources without diagnostics: $noSettingsCount" -ForegroundColor Gray
-    Write-Host "Errors encountered: $errorCount" -ForegroundColor Yellow
+# Check for corruption
+$suspiciousResults = $allResults | Where-Object { 
+    $_.LogAnalyticsTable.Length -le 2 -or
+    ($_.LogAnalyticsTable -notmatch '^[A-Za-z][A-Za-z0-9_]*$' -and -not $_.LogAnalyticsTable.StartsWith("Unknown"))
 }
-Write-Host "Processing time: $($duration.TotalMinutes.ToString('F2')) minutes"
-Write-Host ""
 
-# Display sample results
-Write-Host "Sample Results:" -ForegroundColor Yellow
-$sampleResults = $allResults | Where-Object { $_.LogCategory -ne "No diagnostic settings available" -and $_.LogCategory -notlike "Error:*" } | Select-Object -First 10
-if ($sampleResults.Count -gt 0) {
-    $sampleResults | Select-Object ResourceName, ResourceType, LogCategory, LogAnalyticsTable, MetricCategory, Enabled | Format-Table -AutoSize
-    
+Write-Host ""
+Write-Host "Processing Complete - HTML Structure Parser Results:" -ForegroundColor Green
+Write-Host "====================================================" -ForegroundColor Green
+Write-Host "Resources processed: $processedCount"
+Write-Host "Diagnostic categories found: $($allResults.Count)"
+Write-Host "ResourceType mappings: $($script:ResourceTypeToTables.Keys.Count)"
+Write-Host "Validation errors: $($script:ValidationErrors.Count)"
+Write-Host "Suspicious results: $($suspiciousResults.Count)"
+
+if ($suspiciousResults.Count -gt 0) {
     Write-Host ""
-    Write-Host "Table Name Mapping Information:" -ForegroundColor Cyan
-    Write-Host "===============================" -ForegroundColor Cyan
-    Write-Host "• LogCategory: Name shown in Azure portal diagnostic settings"
-    Write-Host "• LogAnalyticsTable: Actual table name in Log Analytics workspace"
-    Write-Host "• $(if($mappingSuccess) {'✓ Using official Microsoft table reference for accurate mappings'} else {'⚠ Using intelligent fallback mappings (official reference unavailable)'})"
-    if ($script:OfficialTableList.Count -gt 0) {
-        Write-Host "• Found $($script:OfficialTableList.Count) official table names from Microsoft docs"
-    }
-    Write-Host "• Names with '(estimated)' indicate intelligent guesses - verify in your Log Analytics workspace"
-    Write-Host ""
+    Write-Host "⚠ SUSPICIOUS RESULTS (possible corruption):" -ForegroundColor Red
+    $suspiciousResults | Select-Object ResourceType, CategoryName, LogAnalyticsTable | Format-Table -AutoSize
 } else {
-    Write-Host "No diagnostic settings found in this subscription." -ForegroundColor Red
+    Write-Host "✓ No suspicious single-character results detected" -ForegroundColor Green
 }
 
-# Show resources by type
-$resourceTypes = $allResults | Where-Object { $_.LogCategory -ne "No diagnostic settings available" -and $_.LogCategory -notlike "Error:*" } | Group-Object ResourceType | Sort-Object Count -Descending
-if ($resourceTypes.Count -gt 0) {
+# Show some key mappings
+$logicResults = $allResults | Where-Object { $_.ResourceType -eq "Microsoft.Logic/workflows" }
+if ($logicResults.Count -gt 0) {
     Write-Host ""
-    Write-Host "Resources with Diagnostic Settings by Type:" -ForegroundColor Cyan
-    $resourceTypes | Select-Object @{Name="ResourceType";Expression={$_.Name}}, @{Name="Count";Expression={$_.Count}} | Format-Table -AutoSize
+    Write-Host "Logic Apps Results (HTML Structure Parser):" -ForegroundColor Cyan
+    $logicResults | Select-Object ResourceName, CategoryName, CategoryType, LogAnalyticsTable, Enabled | Format-Table -AutoSize
+    
+    $workflowRuntimeLogs = $logicResults | Where-Object { $_.CategoryName -eq "WorkflowRuntime" -and $_.CategoryType -eq "Logs" }
+    if ($workflowRuntimeLogs.Count -gt 0) {
+        $uniqueLogTables = $workflowRuntimeLogs | Select-Object -ExpandProperty LogAnalyticsTable | Sort-Object | Get-Unique
+        if ($uniqueLogTables.Count -eq 1) {
+            Write-Host "✓ WorkflowRuntime consistency: ALL map to $($uniqueLogTables[0])" -ForegroundColor Green
+        } else {
+            Write-Host "⚠ WorkflowRuntime inconsistency: $($uniqueLogTables -join ', ')" -ForegroundColor Red
+        }
+    }
 }
 
 Write-Host ""
-Write-Host "Full results saved to: $outputFile" -ForegroundColor Green
-Write-Host ""
-Write-Host "Usage Tips:" -ForegroundColor Yellow
-Write-Host "- Run without -Verbose for clean auditor reports (default)"
-Write-Host "- Run with -Verbose to see all resources including those without diagnostic settings"
-Write-Host "- Use -SubscriptionId parameter to run non-interactively"
-Write-Host "- Use -DisableTableLookup for faster execution with fallback table names"
+Write-Host "Output saved to: $outputFile" -ForegroundColor Green
+Write-Host "HTML parsing method: Structured <ul>/<li> tag parsing" -ForegroundColor Gray
+
+if ($script:ValidationErrors.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Validation Errors:" -ForegroundColor Red
+    $script:ValidationErrors | Select-Object -Unique | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+}
